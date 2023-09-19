@@ -16,7 +16,7 @@ const char *gl_shader_object_status_to_string(GL_SHADER_OBJECT_STATUS status)
 	SWITCH_MACRO_END()
 }
 
-GL_SHADER_OBJECT_STATUS gl_shader_object_compile(GLuint *p_dst_object, gl_err_buf_s *p_dst_err, GLenum shader_type, const char *p_text)
+GL_SHADER_OBJECT_STATUS gl_shader_object_compile(GLuint *p_dst_object, char *p_dsterr, size_t maxlen, GLenum shader_type, const char *p_text)
 {
 	GLint status;
 	GLuint shader;
@@ -34,7 +34,7 @@ GL_SHADER_OBJECT_STATUS gl_shader_object_compile(GLuint *p_dst_object, gl_err_bu
 	/* get compilation status */
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
 	if (status != GL_TRUE) {
-		glGetShaderInfoLog(shader, (GLsizei)p_dst_err->maxlen, NULL, p_dst_err->p_buffer);
+		glGetShaderInfoLog(shader, (GLsizei)maxlen, NULL, p_dsterr);
 		return GL_SHADER_OBJECT_STATUS_COMPILE_ERROR;
 	}
 
@@ -58,7 +58,8 @@ const char *gl_shader_program_status_to_string(GL_SHADER_PROGRAM_STATUS status)
 	SWITCH_MACRO_END()
 }
 
-GL_SHADER_PROGRAM_STATUS gl_shader_program_create_and_link(GLuint *p_dst_program_object, gl_err_buf_s *p_dst_err,
+GL_SHADER_PROGRAM_STATUS gl_shader_program_create_and_link(GLuint *p_dst_program_object,
+	char *p_dst_err, size_t maxlen,
 	const GLuint *p_objects, GLuint num_objects,
 	const program_attrib_binding_s *p_bindings, GLuint num_bindings)
 {
@@ -84,7 +85,7 @@ GL_SHADER_PROGRAM_STATUS gl_shader_program_create_and_link(GLuint *p_dst_program
 	
 	glGetProgramiv(program, GL_LINK_STATUS, &link_status);
 	if (link_status != GL_TRUE) {
-		glGetProgramInfoLog(program, (GLsizei)p_dst_err->maxlen, NULL, p_dst_err->p_buffer);
+		glGetProgramInfoLog(program, (GLsizei)maxlen, NULL, p_dst_err);
 		return GL_SHADER_PROGRAM_STATUS_LINK_ERROR;
 	}
 	*p_dst_program_object = program;
@@ -148,5 +149,9 @@ GL_SHADER_PROGRAM_STATUS gl_shader_link_program_from_sources(GLuint *p_dst_progr
 		SHADER_PROGRAM_CHECK_SHADER_COMPILE_STATUS(FRAGMENT_SHADER);
 	}
 #undef SHADER_PROGRAM_CHECK_SHADER_COMPILE_STATUS
+
+	/* create program */
+
+
 	return GL_SHADER_PROGRAM_STATUS_OK;
 }

@@ -17,31 +17,71 @@ public:
 
 gl_window window(&callbacks);
 
-static const char *p_vtx = {
-	""
-	""
-	""
-	""
-	""
-	""
-	""
-};
-
-static const char *p_frag = {
-	""
-	""
-	""
-	""
-	""
-	""
-	""
-};
-
 GLuint def_program;
 
 char buffer[1024];
 gl_err_buf_s err_buf = { buffer, sizeof(buffer) };
 
+GLuint make_default_program()
+{
+	static const char *p_vtx = {
+		"#version 330 core\n"
+		""
+		""
+		""
+		""
+		""
+		""
+	};
+
+	static const char *p_frag = {
+		"#version 330 core\n"
+		""
+		""
+		""
+		""
+		""
+		""
+	};
+
+	GLuint program;
+	char buffer[1024];
+	union {
+		struct { GLuint vtx_obj, frag_obj; };
+		GLuint objects[2];
+	};
+
+	GL_SHADER_OBJECT_STATUS shader_status;
+	GL_SHADER_PROGRAM_STATUS prog_status;
+
+	/* vertex shader */
+	shader_status = gl_shader_object_compile(&vtx_obj, buffer, sizeof(buffer), GL_VERTEX_SHADER, p_vtx);
+	if (GL_SHADER_OBJECT_STATUS_OK != shader_status) {
+		printf("GL_VERTEX_SHADER compilation failed with status (%s). Error:\n", gl_shader_object_status_to_string(shader_status));
+		printf(buffer);
+		return 0;
+	}
+
+	/* fragment shader */
+	shader_status = gl_shader_object_compile(&frag_obj, buffer, sizeof(buffer), GL_FRAGMENT_SHADER, p_frag);
+	if (GL_SHADER_OBJECT_STATUS_OK != shader_status) {
+		printf("GL_FRAGMENT_SHADER compilation failed with status (%s). Error:\n", gl_shader_object_status_to_string(shader_status));
+		printf(buffer);
+		return 0;
+	}
+
+	/* create program */
+	const static program_attrib_binding_s attrib_bindings[] = {
+		{ 0, "vertex" },
+		{ 1, "normal" },
+		{ 2, "texcoord" }
+	};
+
+	prog_status = gl_shader_program_create_and_link(&program, buffer, sizeof(buffer), objects, GL_CNT(objects), attrib_bindings, GL_CNT(attrib_bindings));
+	if (GL_SHADER_PROGRAM_STATUS_OK != prog_status) {
+
+	}
+}
 
 int main()
 {
@@ -68,8 +108,8 @@ int main()
 		printf(
 			"\n\n--- gl_shader_link_program_from_sources failed ---\n"
 			"Error: %s\n"
-			"last_shader_index: %d"
-			"last_shader_status: %d"
+			"last_shader_index: %d\n"
+			"last_shader_status: %d\n"
 			""
 			""
 

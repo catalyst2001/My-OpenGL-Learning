@@ -14,6 +14,8 @@ struct gl_err_buf_s {
 	size_t maxlen;
 };
 
+#define GL_CNT(a) (sizeof(a) / sizeof(a[0]))
+
 /* GL SHADER OBJECT */
 enum GL_SHADER_OBJECT_STATUS {
 	GL_SHADER_OBJECT_STATUS_OK = 0,
@@ -23,7 +25,7 @@ enum GL_SHADER_OBJECT_STATUS {
 
 const char *gl_shader_object_status_to_string(GL_SHADER_OBJECT_STATUS status);
 
-GL_SHADER_OBJECT_STATUS gl_shader_object_compile(GLuint *p_dst_object, gl_err_buf_s *p_dst_err, GLenum shader_type, const char *p_text);
+GL_SHADER_OBJECT_STATUS gl_shader_object_compile(GLuint *p_dst_object, char *p_dsterr, size_t maxlen, GLenum shader_type, const char *p_text);
 GL_SHADER_OBJECT_STATUS gl_shader_object_delete(GLuint *src_object);
 
 /* GL PROGRAM OBJECT */
@@ -40,7 +42,8 @@ struct program_attrib_binding_s {
 	const char *p_attrib_name;
 };
 
-GL_SHADER_PROGRAM_STATUS gl_shader_program_create_and_link(GLuint *p_dst_program_object, gl_err_buf_s *p_dst_err,
+GL_SHADER_PROGRAM_STATUS gl_shader_program_create_and_link(GLuint *p_dst_program_object,
+	char *p_dst_err, size_t maxlen,
 	const GLuint *p_objects, GLuint num_objects,
 	const program_attrib_binding_s *p_bindings, GLuint num_bindings);
 
