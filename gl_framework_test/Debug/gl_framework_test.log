@@ -1,4 +1,3 @@
 ﻿  glad.c
-  gl_window.cpp
-e:\github\my-opengl-learning\common\gl_window.cpp(72): warning C4302: приведение типов: усечение из "LPWSTR" к "WORD"
+  main.cpp
   gl_framework_test.vcxproj -> E:\GITHUB\My-OpenGL-Learning\Debug\gl_framework_test.exe

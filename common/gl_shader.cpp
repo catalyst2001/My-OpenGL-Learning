@@ -121,7 +121,7 @@ GL_SHADER_PROGRAM_STATUS gl_shader_link_program_from_sources(GLuint *p_dst_progr
 
 	/* VERTEX_SHADER */
 	if (p_source_ptrs->p_vert_src) {
-		shader_status = gl_shader_object_compile(&shaders[VERTEX_SHADER], p_dst_err, GL_VERTEX_SHADER, p_source_ptrs->p_vert_src);
+		shader_status = gl_shader_object_compile(&shaders[VERTEX_SHADER], p_dst_err->p_buffer, p_dst_err->maxlen, GL_VERTEX_SHADER, p_source_ptrs->p_vert_src);
 		SHADER_PROGRAM_CHECK_SHADER_COMPILE_STATUS(VERTEX_SHADER);
 	}
 
@@ -145,7 +145,7 @@ GL_SHADER_PROGRAM_STATUS gl_shader_link_program_from_sources(GLuint *p_dst_progr
 
 	/* FRAGMENT_SHADER */
 	if (p_source_ptrs->p_frag_src) {
-		shader_status = gl_shader_object_compile(&shaders[FRAGMENT_SHADER], p_dst_err, GL_FRAGMENT_SHADER, p_source_ptrs->p_frag_src);
+		shader_status = gl_shader_object_compile(&shaders[FRAGMENT_SHADER], p_dst_err->p_buffer, p_dst_err->maxlen, GL_FRAGMENT_SHADER, p_source_ptrs->p_frag_src);
 		SHADER_PROGRAM_CHECK_SHADER_COMPILE_STATUS(FRAGMENT_SHADER);
 	}
 #undef SHADER_PROGRAM_CHECK_SHADER_COMPILE_STATUS

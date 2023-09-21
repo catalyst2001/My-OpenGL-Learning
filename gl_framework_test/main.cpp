@@ -18,6 +18,7 @@ public:
 gl_window window(&callbacks);
 
 GLuint def_program;
+GLuint def_vao;
 
 char buffer[1024];
 gl_err_buf_s err_buf = { buffer, sizeof(buffer) };
@@ -27,21 +28,38 @@ GLuint make_default_program()
 	static const char *p_vtx = {
 		"#version 330 core\n"
 		""
-		""
-		""
-		""
-		""
-		""
+		"in vec3 vertex;"
+		"in vec3 normal;"
+		"in vec2 texcoord;"
+
+		"out vec2 frag_texcoord;"
+
+		"uniform mat4 MVP;"
+
+		"out vec4 world_position;"
+
+		"void main()"
+		"{"
+			""
+			""
+			"world_position = MVP * vec4(vertex, 1.0);"
+		"}"
 	};
 
 	static const char *p_frag = {
 		"#version 330 core\n"
-		""
-		""
-		""
-		""
-		""
-		""
+
+		"in vec2 frag_texcoord;"
+
+		"uniform sampler2D diffuse_sampler;"
+
+		"out vec4 out_color;"
+		
+		"void main()"
+		"{"
+			""
+			"out_color = texture(diffuse_sampler, frag_texcoord);"
+		"}"
 	};
 
 	GLuint program;
@@ -79,8 +97,13 @@ GLuint make_default_program()
 
 	prog_status = gl_shader_program_create_and_link(&program, buffer, sizeof(buffer), objects, GL_CNT(objects), attrib_bindings, GL_CNT(attrib_bindings));
 	if (GL_SHADER_PROGRAM_STATUS_OK != prog_status) {
-
+		printf("gl_shader_program_create_and_link failed with status (%s). Error:\n", gl_shader_program_status_to_string(prog_status));
+		printf(buffer);
+		return 0;
 	}
+
+	printf("Program created!\n");
+	return program;
 }
 
 int main()
@@ -96,25 +119,14 @@ int main()
 		return 1;
 	}
 
-
-	/* init default shaders */
-	GL_SHADER_INDICES last_shader_index;
-	GL_SHADER_OBJECT_STATUS last_shader_status;
-	program_sources_s sources;
-	GL_PROGRAM_SOURCES_PTR_INIT(&sources);
-	sources.p_vert_src = p_vtx;
-	sources.p_frag_src = p_frag;
-	if (gl_shader_link_program_from_sources(&def_program, &err_buf, &last_shader_status, &last_shader_index, &sources) != GL_SHADER_PROGRAM_STATUS_OK) {
-		printf(
-			"\n\n--- gl_shader_link_program_from_sources failed ---\n"
-			"Error: %s\n"
-			"last_shader_index: %d\n"
-			"last_shader_status: %d\n"
-			""
-			""
-
-		);
+	def_program = make_default_program();
+	if (!def_program) {
+		printf("Program creating failed!\n");
+		return 1;
 	}
+
+	glGenVertexArrays(1, &def_vao);
+	glBindVertexArray(def_vao);
 
 
 	glEnable(GL_DEPTH_TEST);
